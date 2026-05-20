@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>ChatBot Corporación Politécnico de América</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
+
+body{
+    background:linear-gradient(135deg,#001d3d,#003566);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+.chat-container{
+    width:430px;
+    height:730px;
+    background:white;
+    border-radius:25px;
+    overflow:hidden;
+    box-shadow:0 0 30px rgba(0,0,0,0.3);
+    display:flex;
+    flex-direction:column;
+}
+
+.header{
+    background:#001d3d;
+    color:white;
+    padding:25px;
+    text-align:center;
+}
+
+.header h1{
+    background:#001d3d;
+    color:white;
+    padding:35px 25px;
+    text-align:center;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+}
+
+.header p{
+    margin-top:8px;
+    font-size:14px;
+}
+
+.chat-box{
+    flex:1;
+    padding:15px;
+    overflow-y:auto;
+    background:#f4f6f9;
+}
+
+.message{
+    padding:12px;
+    margin:10px 0;
+    border-radius:15px;
+    max-width:85%;
+    animation:fade 0.3s ease;
+}
+
+.user{
+    background:#0077ff;
+    color:white;
+    margin-left:auto;
+}
+
+.bot{
+    background:#e4e6eb;
+    color:black;
+}
+
+.message small{
+    display:block;
+    margin-top:5px;
+    font-size:10px;
+    opacity:0.7;
+}
+
+.menu-buttons{
+    padding:10px;
+    background:white;
+    border-top:1px solid #ddd;
+    text-align:center;
+}
+
+.menu-buttons button{
+    padding:10px 18px;
+    border:none;
+    background:#0077ff;
+    color:white;
+    border-radius:12px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.input-area{
+    display:flex;
+    padding:12px;
+    background:white;
+    border-top:1px solid #ddd;
+}
+
+.input-area input{
+    flex:1;
+    padding:12px;
+    border:1px solid #ccc;
+    border-radius:12px;
+    outline:none;
+}
+
+.input-area button{
+    margin-left:10px;
+    padding:12px 18px;
+    border:none;
+    background:#001d3d;
+    color:white;
+    border-radius:12px;
+    cursor:pointer;
+}
+
+.whatsapp-button{
+    position:fixed;
+    bottom:20px;
+    right:20px;
+}
+
+.whatsapp-button a{
+    background:#25D366;
+    color:white;
+    padding:15px 20px;
+    border-radius:50px;
+    text-decoration:none;
+    font-weight:bold;
+}
+
+@keyframes fade{
+    from{
+        opacity:0;
+        transform:translateY(10px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="chat-container">
+
+    <div class="header">
+        <h1>🎓 ChatBot Universidad</h1>
+        <p>Corporación Politécnico de América</p>
+    </div>
+
+    <div class="chat-box" id="chatBox">
+
+        <div class="message bot">
+            👋 Hola, soy el asistente virtual.<br><br>
+
+            Puedes preguntarme sobre:<br><br>
+
+            • Carreras<br>
+            • Costos<br>
+            • Descuentos<br>
+            • Ubicación<br>
+            • Correo<br>
+            • WhatsApp
+        </div>
+
+    </div>
+
+    <div class="menu-buttons">
+        <button onclick="mostrarCarreras()">📚 Ver Carreras</button>
+    </div>
+
+    <div class="input-area">
+
+        <input 
+        type="text" 
+        id="userInput"
+        placeholder="Escribe tu pregunta...">
+
+        <button onclick="sendMessage()">Enviar</button>
+
+    </div>
+
+</div>
+
+<!-- BOTÓN WHATSAPP -->
+
+<div class="whatsapp-button">
+    <a 
+    href="https://wa.me/573053394367?text=Hola%20👋%20Quiero%20información%20sobre%20las%20carreras"
+    target="_blank">
+        💬 WhatsApp
+    </a>
+</div>
+
+<script>
+
+// BASE DE DATOS
+
+const carreras = {
+
+1:{
+nombre:"Auxiliar Administrativo en Salud",
+semestres:3,
+costo:"$1.200.000",
+jornada:"Diurna y Nocturna",
+descripcion:"Procesos administrativos del sector salud.",
+trabajo:"Clínicas, hospitales y EPS."
+},
+
+2:{
+nombre:"Auxiliar en Farmacia",
+semestres:3,
+costo:"$1.000.000",
+jornada:"Diurna",
+descripcion:"Medicamentos y atención farmacéutica.",
+trabajo:"Droguerías y farmacias."
+},
+
+3:{
+nombre:"Auxiliar en Salud Pública",
+semestres:3,
+costo:"$1.100.000",
+jornada:"Diurna",
+descripcion:"Promoción y prevención de salud.",
+trabajo:"Campañas de salud."
+},
+
+4:{
+nombre:"Auxiliar en Enfermería",
+semestres:3,
+costo:"$2.500.000",
+jornada:"Diurna y Virtual",
+descripcion:"Atención básica a pacientes.",
+trabajo:"Hospitales y clínicas."
+},
+
+5:{
+nombre:"Auxiliar en Salud Oral",
+semestres:3,
+costo:"$2.300.000",
+jornada:"Diurna",
+descripcion:"Apoyo odontológico.",
+trabajo:"Consultorios odontológicos."
+},
+
+6:{
+nombre:"Cocina Nacional e Internacional",
+semestres:3,
+costo:"$3.200.000",
+jornada:"Diurna",
+descripcion:"Preparación de platos.",
+trabajo:"Hoteles y restaurantes."
+},
+
+7:{
+nombre:"Hotelería y Turismo",
+semestres:3,
+costo:"$2.800.000",
+jornada:"Diurna",
+descripcion:"Atención turística.",
+trabajo:"Agencias y hoteles."
+},
+
+8:{
+nombre:"Atención a la Primera Infancia",
+semestres:3,
+costo:"$2.400.000",
+jornada:"Diurna",
+descripcion:"Cuidado infantil.",
+trabajo:"Jardines y colegios."
+},
+
+9:{
+nombre:"Auxiliar Contable y Financiero",
+semestres:3,
+costo:"$2.200.000",
+jornada:"Nocturna",
+descripcion:"Contabilidad y finanzas.",
+trabajo:"Empresas."
+},
+
+10:{
+nombre:"Auxiliar en Bodega y Logística",
+semestres:3,
+costo:"$2.000.000",
+jornada:"Diurna",
+descripcion:"Inventarios y logística.",
+trabajo:"Bodegas y empresas."
+},
+
+11:{
+nombre:"Seguridad y Salud Ocupacional",
+semestres:3,
+costo:"$2.600.000",
+jornada:"Diurna",
+descripcion:"Prevención de riesgos.",
+trabajo:"Empresas industriales."
+},
+
+12:{
+nombre:"Mecánica Diesel",
+semestres:3,
+costo:"$3.000.000",
+jornada:"Diurna",
+descripcion:"Motores diesel.",
+trabajo:"Talleres automotrices."
+},
+
+13:{
+nombre:"Electricidad Industrial",
+semestres:3,
+costo:"$3.100.000",
+jornada:"Diurna",
+descripcion:"Instalaciones eléctricas.",
+trabajo:"Sector industrial."
+},
+
+14:{
+nombre:"Auxiliar en Sistemas",
+semestres:3,
+costo:"$2.700.000",
+jornada:"Diurna y Virtual",
+descripcion:"Soporte técnico.",
+trabajo:"Empresas tecnológicas."
+}
+
+};
+
+// ENVIAR MENSAJE
+
+function sendMessage(){
+
+const input = document.getElementById("userInput");
+
+const message = input.value.trim();
+
+if(message === "") return;
+
+addMessage(message, "user");
+
+const response = botResponse(message.toLowerCase());
+
+setTimeout(() => {
+
+addMessage(response, "bot");
+
+},500);
+
+input.value = "";
+
+}
+
+// AGREGAR MENSAJE
+
+function addMessage(text, sender){
+
+const chatBox = document.getElementById("chatBox");
+
+const messageDiv = document.createElement("div");
+
+messageDiv.classList.add("message", sender);
+
+const time = new Date().toLocaleTimeString([],{
+hour:'2-digit',
+minute:'2-digit'
+});
+
+messageDiv.innerHTML = `
+<div>${text}</div>
+<small>${time}</small>
+`;
+
+chatBox.appendChild(messageDiv);
+
+chatBox.scrollTop = chatBox.scrollHeight;
+
+}
+
+// MOSTRAR CARRERAS
+
+function mostrarCarreras(){
+
+let lista = `
+🎓 Carreras Disponibles:<br><br>
+`;
+
+for(let numero in carreras){
+
+lista += `
+<span style="color:black; font-weight:bold;">${numero}.</span> ${carreras[numero].nombre}
+`;
+
+}
+
+lista += `
+<br>✍️ Escribe el número de la carrera para ver la información.
+`;
+
+addMessage(lista,"bot");
+
+}
+
+// RESPUESTAS BOT
+
+function botResponse(message){
+
+if(
+message.includes("hola") ||
+message.includes("buenas")
+){
+
+return "👋 ¡Hola! ¿Cómo puedo ayudarte?";
+}
+
+// WHATSAPP
+
+if(
+message.includes("asesor") ||
+message.includes("whatsapp") ||
+message.includes("humano")
+){
+
+setTimeout(() => {
+
+window.open(
+"https://wa.me/573053394367?text=Hola%20👋%20Quiero%20información%20sobre%20las%20carreras",
+"_blank"
+);
+
+},1000);
+
+return `
+📲 Te estamos redirigiendo a WhatsApp...
+`;
+
+}
+
+// UBICACIÓN
+
+if(
+message.includes("ubicacion") ||
+message.includes("direccion")
+){
+
+return `
+📍 UBICACIÓN<br><br>
+
+🏢 Corporación Politécnico de América<br><br>
+
+📌 Calle 45 #20-15<br><br>
+
+🕒 Lunes a Sábado<br>
+8:00 AM - 6:00 PM
+`;
+
+}
+
+// CORREO
+
+if(
+message.includes("correo") ||
+message.includes("contacto")
+){
+
+return `
+📧 Correo:<br><br>
+
+admisiones@politecnicodeamerica.edu.co
+`;
+
+}
+
+// DESCUENTOS
+
+if(
+message.includes("descuento") ||
+message.includes("beca")
+){
+
+return `
+🎓 DESCUENTOS:<br><br>
+
+✅ SISBÉN A1 - A5 → 20%<br>
+✅ SISBÉN B1 - B7 → 15%<br>
+✅ SISBÉN C1 - C18 → 10%
+`;
+
+}
+
+// CARRERAS
+
+if(message.includes("carreras")){
+
+mostrarCarreras();
+
+return "📚 Estas son nuestras carreras.";
+
+}
+
+// INFORMACIÓN CARRERA
+
+if(carreras[message]){
+
+let carrera = carreras[message];
+
+return `
+🎓 <b>${carrera.nombre}</b><br><br>
+
+📚 ${carrera.descripcion}<br><br>
+
+🕒 Jornada: ${carrera.jornada}<br>
+📖 Semestres: ${carrera.semestres}<br>
+💰 Costo: ${carrera.costo}<br><br>
+
+💼 Campo laboral:<br>
+${carrera.trabajo}
+`;
+
+}
+
+return `
+🤖 No entendí tu pregunta.<br><br>
+
+Puedes preguntar sobre:<br><br>
+
+• Carreras<br>
+• Costos<br>
+• Descuentos<br>
+• Ubicación<br>
+• Correo<br>
+• WhatsApp
+`;
+
+}
+
+// ENTER PARA ENVIAR
+
+document.getElementById("userInput")
+.addEventListener("keypress", function(event){
+
+if(event.key === "Enter"){
+
+sendMessage();
+
+}
+
+});
+
+</script>
+
+</body>
+</html>
